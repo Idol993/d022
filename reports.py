@@ -388,31 +388,29 @@ class ReportGenerator:
 
             ws1["A3"] = f"报告周期: {report.start_date.strftime('%Y-%m-%d')} ~ {report.end_date.strftime('%Y-%m-%d')}"
             ws1["A3"].font = Font(name="微软雅黑", size=11, italic=True)
-            ws1.merge_cells("A3:F3")
 
             metrics = [
-                ("总发布次数", report.total_releases, "D3"),
-                ("成功发布次数", report.success_releases, "D4"),
-                ("回滚次数", report.rollback_count, "D5"),
-                ("发布成功率(%)", report.success_rate, "D6"),
-                ("平均审批时长(小时)", report.avg_approval_hours, "D7"),
+                ("总发布次数", report.total_releases),
+                ("成功发布次数", report.success_releases),
+                ("回滚次数", report.rollback_count),
+                ("发布成功率(%)", report.success_rate),
+                ("平均审批时长(小时)", report.avg_approval_hours),
             ]
 
-            for i, (label, value, cell_pos) in enumerate(metrics):
-                row = 3 + i
+            for i, (label, value) in enumerate(metrics):
+                row = 5 + i
                 ws1.cell(row=row, column=1, value=label).font = normal_font
                 ws1.cell(row=row, column=1).fill = PatternFill(start_color="D9E2F3", end_color="D9E2F3", fill_type="solid")
-                ws1.cell(row=row, column=4, value=value).font = Font(name="微软雅黑", size=12, bold=True)
-                ws1.cell(row=row, column=4).alignment = Alignment(horizontal="right")
+                ws1.cell(row=row, column=2, value=value).font = Font(name="微软雅黑", size=12, bold=True)
+                ws1.cell(row=row, column=2).alignment = Alignment(horizontal="right")
 
-            ws1["A9"] = "生成时间:"
-            ws1["A9"].font = normal_font
-            ws1["B9"] = report.generated_at.strftime("%Y-%m-%d %H:%M:%S") if report.generated_at else ""
-            ws1["B9"].font = normal_font
+            ws1["A11"] = "生成时间:"
+            ws1["A11"].font = normal_font
+            ws1["B11"] = report.generated_at.strftime("%Y-%m-%d %H:%M:%S") if report.generated_at else ""
+            ws1["B11"].font = normal_font
 
-            ws1.column_dimensions["A"].width = 20
-            ws1.column_dimensions["B"].width = 30
-            ws1.column_dimensions["D"].width = 15
+            ws1.column_dimensions["A"].width = 25
+            ws1.column_dimensions["B"].width = 20
 
             ws2 = wb.create_sheet("发布明细")
 
@@ -734,8 +732,9 @@ class ReleaseQueryService:
 
         if "grayscale_phases" in release_data:
             for phase in release_data["grayscale_phases"]:
-                for z in phase.get("zones", []):
-                    zones.add(z)
+                if phase.get("status") in ("in_progress", "completed"):
+                    for z in phase.get("zones", []):
+                        zones.add(z)
 
         if "rollback_records" in release_data:
             for rb in release_data["rollback_records"]:
@@ -895,12 +894,14 @@ class ReleaseQueryService:
                          end_date: datetime = None,
                          zone_id: str = None,
                          is_drill: bool = None,
+                         version: str = None,
                          format: str = "json") -> str:
         rollbacks = self.query_rollbacks(
             start_date=start_date,
             end_date=end_date,
             zone_id=zone_id,
             is_drill=is_drill,
+            version=version,
         )
 
         output_path = Path(output_file)
@@ -915,10 +916,20 @@ class ReleaseQueryService:
                 writer = csv.writer(f)
                 writer.writerow([
                     "回滚ID", "发布ID", "发布版本", "发布类型",
-                    "从版本", "回滚至", "原因", "是否演练",
-                    "影响厂区数", "开始时间", "完成时间"
+                    "从版本", "回滚至版本", "回滚原因", "是否演练",
+                    "影响厂区", "影响厂区数", "开始时间", "完成时间", "执行时间(秒)"
                 ])
                 for rb in rollbacks:
+                    affected_zones = ",".join(rb.get("affected_zones", []))
+                    duration = ""
+                    if rb.get("started_at") and rb.get("completed_at"):
+                        try:
+                            from datetime import datetime
+                            s = datetime.fromisoformat(rb["started_at"])
+                            c = datetime.fromisoformat(rb["completed_at"])
+                            duration = str(round((c - s).total_seconds(), 2))
+                        except:
+                            pass
                     writer.writerow([
                         rb.get("rollback_id", ""),
                         rb.get("release_id", ""),
@@ -928,9 +939,11 @@ class ReleaseQueryService:
                         rb.get("to_version", ""),
                         rb.get("reason", ""),
                         "是" if rb.get("is_drill") else "否",
+                        affected_zones,
                         len(rb.get("affected_zones", [])),
                         rb.get("started_at", ""),
                         rb.get("completed_at", ""),
+                        duration,
                     ])
 
         return str(output_path)

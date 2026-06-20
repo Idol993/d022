@@ -218,5 +218,13 @@ class GrayscaleReleaseManager:
     def get_active_phases(self, release: ReleaseRecord) -> List[GrayscalePhase]:
         return [p for p in release.grayscale_phases if p.status == "in_progress"]
 
+    def get_deployed_zones(self, release: ReleaseRecord) -> List[str]:
+        deployed = set()
+        for phase in release.grayscale_phases:
+            if phase.status in ("in_progress", "completed"):
+                for z in phase.zones:
+                    deployed.add(z)
+        return list(deployed)
+
     def get_all_zone_status(self) -> List[Dict]:
         return self.zone_store.get_zones_status()

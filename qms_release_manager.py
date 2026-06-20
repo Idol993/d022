@@ -330,55 +330,68 @@ class QMSReleaseManager:
 
     def query_releases(self, start_date: str = None, end_date: str = None,
                        zone_id: str = None, version: str = None,
-                       status: str = None, release_type: str = None) -> List[ReleaseRecord]:
-        query_params = {}
-        if start_date:
-            query_params["start_date"] = start_date
-        if end_date:
-            query_params["end_date"] = end_date
-        if zone_id:
-            query_params["zone_id"] = zone_id
-        if version:
-            query_params["version"] = version
-        if status:
-            query_params["status"] = status
-        if release_type:
-            query_params["release_type"] = release_type
+                       status: str = None, release_type: str = None) -> list:
+        from datetime import datetime
 
-        results = self.query_service.query_releases(**query_params)
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+        status_enum = ReleaseStatus(status) if status else None
+        type_enum = ReleaseType(release_type) if release_type else None
+
+        results = self.query_service.query_releases(
+            start_date=start_dt,
+            end_date=end_dt,
+            zone_id=zone_id,
+            version=version,
+            status=status_enum,
+            release_type=type_enum,
+        )
 
         print(f"\n🔍 发布记录检索 (共 {len(results)} 条)")
-        if query_params:
-            print(f"   筛选条件: {query_params}")
+        filter_info = {}
+        if start_date: filter_info["start"] = start_date
+        if end_date: filter_info["end"] = end_date
+        if zone_id: filter_info["zone"] = zone_id
+        if version: filter_info["version"] = version
+        if status: filter_info["status"] = status
+        if release_type: filter_info["type"] = release_type
+        if filter_info:
+            print(f"   筛选条件: {filter_info}")
         print("=" * 70)
         print(f"{'版本号':<15} {'类型':<10} {'状态':<18} {'创建时间':<20} {'影响厂区数':<10}")
         print("-" * 70)
 
         for r in results:
-            zone_count = len(set(z for p in r.grayscale_phases for z in p.zones))
-            print(f"{r.version:<15} {r.release_type.value:<10} "
-                  f"{r.status.value:<18} {r.created_at.strftime('%Y-%m-%d %H:%M'):<20} "
+            zone_count = len(self.query_service._get_release_zones(r))
+            created_at = r.get("created_at", "")[:16].replace("T", " ")
+            print(f"{r.get('version',''):<15} {r.get('release_type',''):<10} "
+                  f"{r.get('status',''):<18} {created_at:<20} "
                   f"{zone_count:<10}")
 
         return results
 
     def query_rollbacks(self, start_date: str = None, end_date: str = None,
                         zone_id: str = None, version: str = None) -> list:
-        query_params = {}
-        if start_date:
-            query_params["start_date"] = start_date
-        if end_date:
-            query_params["end_date"] = end_date
-        if zone_id:
-            query_params["zone_id"] = zone_id
-        if version:
-            query_params["version"] = version
+        from datetime import datetime
 
-        results = self.query_service.query_rollbacks(**query_params)
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+
+        results = self.query_service.query_rollbacks(
+            start_date=start_dt,
+            end_date=end_dt,
+            zone_id=zone_id,
+            version=version,
+        )
 
         print(f"\n🔍 回滚记录检索 (共 {len(results)} 条)")
-        if query_params:
-            print(f"   筛选条件: {query_params}")
+        filter_info = {}
+        if start_date: filter_info["start"] = start_date
+        if end_date: filter_info["end"] = end_date
+        if zone_id: filter_info["zone"] = zone_id
+        if version: filter_info["version"] = version
+        if filter_info:
+            print(f"   筛选条件: {filter_info}")
         print("=" * 70)
         print(f"{'回滚ID':<12} {'版本':<12} {'类型':<8} {'原因':<20} {'时间':<18}")
         print("-" * 70)
@@ -386,9 +399,9 @@ class QMSReleaseManager:
         for rb in results:
             rb_type = "演练" if rb.get("is_drill") else "正式"
             reason = (rb.get("reason", "") or "")[:18]
+            exec_time = (rb.get("executed_at", "") or "")[:16].replace("T", " ")
             print(f"{rb.get('rollback_id',''):<12} {rb.get('to_version',''):<12} "
-                  f"{rb_type:<8} {reason:<20} "
-                  f"{rb.get('executed_at',''):<18}")
+                  f"{rb_type:<8} {reason:<20} {exec_time:<18}")
 
         return results
 
@@ -397,28 +410,29 @@ class QMSReleaseManager:
                              zone_id: str = None, version: str = None,
                              status: str = None, release_type: str = None,
                              output_path: str = None) -> str:
-        query_params = {}
-        if start_date:
-            query_params["start_date"] = start_date
-        if end_date:
-            query_params["end_date"] = end_date
-        if zone_id:
-            query_params["zone_id"] = zone_id
-        if version:
-            query_params["version"] = version
-        if status:
-            query_params["status"] = status
-        if release_type:
-            query_params["release_type"] = release_type
+        from datetime import datetime
+        from pathlib import Path
 
-        if output_format == "json":
-            path = self.query_service.export_releases(
-                output_format="json", output_path=output_path, **query_params
-            )
-        else:
-            path = self.query_service.export_releases(
-                output_format="csv", output_path=output_path, **query_params
-            )
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+        status_enum = ReleaseStatus(status) if status else None
+        type_enum = ReleaseType(release_type) if release_type else None
+
+        if not output_path:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            ext = "json" if output_format == "json" else "csv"
+            output_path = str(Path(CONFIG["storage"]["data_dir"]) / f"releases_export_{timestamp}.{ext}")
+
+        path = self.query_service.export_releases(
+            output_file=output_path,
+            format=output_format,
+            start_date=start_dt,
+            end_date=end_dt,
+            zone_id=zone_id,
+            version=version,
+            status=status_enum,
+            release_type=type_enum,
+        )
 
         print(f"\n📤 导出完成: {path}")
         return path
@@ -713,19 +727,53 @@ def _handle_query_command(manager):
 
 def _handle_export_command(manager):
     params = _parse_args(sys.argv)
+    export_type = params.get("type", "release")
     output_format = params.get("format", "json")
     output_path = params.get("output")
+    start_date = params.get("start")
+    end_date = params.get("end")
+    zone_id = params.get("zone")
+    version = params.get("version")
 
-    manager.export_query_results(
-        output_format=output_format,
-        start_date=params.get("start"),
-        end_date=params.get("end"),
-        zone_id=params.get("zone"),
-        version=params.get("version"),
-        status=params.get("status"),
-        release_type=params.get("release-type"),
-        output_path=output_path,
-    )
+    from datetime import datetime
+    from pathlib import Path
+
+    start_dt = datetime.fromisoformat(start_date) if start_date else None
+    end_dt = datetime.fromisoformat(end_date) if end_date else None
+
+    if not output_path:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        ext = "json" if output_format == "json" else "csv"
+        prefix = "rollbacks" if export_type == "rollback" else "releases"
+        output_path = str(Path(CONFIG["storage"]["data_dir"]) / f"{prefix}_export_{timestamp}.{ext}")
+
+    if export_type == "rollback":
+        path = manager.query_service.export_rollbacks(
+            output_file=output_path,
+            format=output_format,
+            start_date=start_dt,
+            end_date=end_dt,
+            zone_id=zone_id,
+            version=version,
+        )
+    else:
+        from models import ReleaseStatus, ReleaseType
+        status_enum = ReleaseStatus(params.get("status")) if params.get("status") else None
+        type_enum = ReleaseType(params.get("release-type")) if params.get("release-type") else None
+
+        path = manager.query_service.export_releases(
+            output_file=output_path,
+            format=output_format,
+            start_date=start_dt,
+            end_date=end_dt,
+            zone_id=zone_id,
+            version=version,
+            status=status_enum,
+            release_type=type_enum,
+        )
+
+    print(f"\n📤 导出完成: {path}")
+    return path
 
 
 def _handle_scheduler_command(manager):

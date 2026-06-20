@@ -6,7 +6,7 @@
     "description": "非核心研发测试厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.954959",
+    "last_updated": "2026-06-21T05:33:02.485240",
     "last_release_id": ""
   },
   {
@@ -16,7 +16,7 @@
     "description": "非核心办公系统厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.955153",
+    "last_updated": "2026-06-21T05:33:02.485446",
     "last_release_id": ""
   },
   {
@@ -26,18 +26,18 @@
     "description": "常规产品组装产线",
     "current_version": "v2.4.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.949043",
-    "last_release_id": "b71d984a-2d40-43bf-b0bc-c59ce0e6e3fd"
+    "last_updated": "2026-06-21T05:33:02.480921",
+    "last_release_id": "5510fff3-45cb-407e-9a74-9ec8fccb9677"
   },
   {
     "zone_id": "tier2_assembly_02",
     "name": "组装二车间",
     "tier": "tier2_assembly",
     "description": "常规产品组装产线",
-    "current_version": "v2.4.0",
+    "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.949249",
-    "last_release_id": "b71d984a-2d40-43bf-b0bc-c59ce0e6e3fd"
+    "last_updated": "2026-06-21T05:33:02.483223",
+    "last_release_id": ""
   },
   {
     "zone_id": "tier1_sterile_01",

@@ -1,0 +1,37 @@
+{
+  "report_type": "rollback_report",
+  "rollback_id": "dcb7230e-28c0-471c-9f91-08aaae88ec48",
+  "release_id": "5510fff3-45cb-407e-9a74-9ec8fccb9677",
+  "release_version": "v2.4.0",
+  "rollback_to_version": "v2.3.0",
+  "rollback_reason": "回滚演练: 6月月度回滚演练",
+  "is_drill": true,
+  "timeline": {
+    "started_at": "2026-06-21T05:33:02.485017",
+    "completed_at": "2026-06-21T05:33:02.485560",
+    "duration_seconds": 0.0
+  },
+  "impact_analysis": {
+    "affected_zones": [
+      "tier3_rd_01",
+      "tier3_office_01"
+    ],
+    "affected_batches": [],
+    "estimated_impact_scope": "limited"
+  },
+  "root_cause": {
+    "description": "回滚演练: 6月月度回滚演练",
+    "category": "drill"
+  },
+  "remediation_actions": [
+    "版本已回滚至上一稳定版本",
+    "业务监控已重启并持续观察",
+    "问题已记录并将进入根本原因分析流程"
+  ],
+  "follow_up_items": [
+    "组织技术团队分析异常根因",
+    "评估是否需要启动偏差/CAPA流程",
+    "验证修复后重新安排发布"
+  ],
+  "generated_at": "2026-06-21T05:33:02.485704"
+}

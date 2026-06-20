@@ -111,12 +111,19 @@ class RollbackManager:
         if not release.previous_version:
             raise ValueError("未设置回滚目标版本（previous_version）")
 
+        deployed_zones = self.release_manager.get_deployed_zones(release)
+
+        if not affected_zones:
+            affected_zones = deployed_zones
+        else:
+            affected_zones = list(set(affected_zones) & set(deployed_zones))
+
         rollback_id = str(uuid.uuid4())
         rollback = RollbackRecord(
             rollback_id=rollback_id,
             release_id=release.release_id,
             reason=reason,
-            affected_zones=affected_zones or [],
+            affected_zones=affected_zones,
             from_version=release.version,
             to_version=release.previous_version,
             started_at=datetime.now(),
@@ -274,10 +281,11 @@ class RollbackManager:
             self.circuit_breaker.trip(release, result["violations"][0]["reason"], affected_zones)
 
             if self.circuit_breaker.config.auto_rollback_enabled:
+                all_deployed = self.release_manager.get_deployed_zones(release)
                 self.execute_rollback(
                     release=release,
                     reason=result["violations"][0]["reason"],
-                    affected_zones=affected_zones,
+                    affected_zones=all_deployed,
                 )
                 result["action_taken"] = "auto_rollback"
 

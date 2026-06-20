@@ -1,7 +1,7 @@
 {
-  "report_id": "cd5e4cf3-6e0e-407d-860c-28a5e27a6bd5",
-  "start_date": "2026-06-14T05:58:14.208359",
-  "end_date": "2026-06-21T05:58:14.208359",
+  "report_id": "28a5a758-4fa6-43de-867b-7fac151bf967",
+  "start_date": "2026-06-14T06:36:59.077225",
+  "end_date": "2026-06-21T06:36:59.077225",
   "total_releases": 1,
   "success_releases": 0,
   "rollback_count": 1,
@@ -9,15 +9,15 @@
   "success_rate": 0.0,
   "release_details": [
     {
-      "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
+      "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
       "version": "v2.4.0",
       "type": "regular",
       "status": "rolled_back",
-      "created_at": "2026-06-21T05:58:14.191846",
+      "created_at": "2026-06-21T06:36:59.064840",
       "rollback_count": 1,
       "title": "QMS 系统 2.4 版本 - 功能增强与bug修复",
       "requester": "dev_leader"
     }
   ],
-  "generated_at": "2026-06-21T05:58:14.208379"
+  "generated_at": "2026-06-21T06:36:59.077237"
 }

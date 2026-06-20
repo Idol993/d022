@@ -840,7 +840,7 @@ class ReleaseQueryService:
         return sorted(rollbacks, key=lambda x: x.get("started_at", ""), reverse=True)
 
     def get_release_detail(self, release_id: str) -> Optional[Dict]:
-        file_path = self.releases_dir / f"release_{release_id}.json"
+        file_path = self.releases_dir / f"{release_id}.json"
         if file_path.exists():
             with open(file_path, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -895,7 +895,8 @@ class ReleaseQueryService:
                          zone_id: str = None,
                          is_drill: bool = None,
                          version: str = None,
-                         format: str = "json") -> str:
+                         format: str = "json",
+                         per_zone_details: bool = True) -> str:
         rollbacks = self.query_rollbacks(
             start_date=start_date,
             end_date=end_date,
@@ -908,48 +909,130 @@ class ReleaseQueryService:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         if format == "json":
+            full_data = []
+            for rb in rollbacks:
+                zones_detail = []
+                for z in rb.get("affected_zones", []):
+                    zones_detail.append({
+                        "zone_id": z,
+                        "from_version": rb.get("from_version", ""),
+                        "to_version": rb.get("to_version", ""),
+                        "in_grayscale": self._is_zone_in_grayscale(rb.get("release_id", ""), z),
+                        "is_drill": rb.get("is_drill", False),
+                    })
+                rb_full = dict(rb)
+                rb_full["zones_detail"] = zones_detail
+                full_data.append(rb_full)
+
             with open(output_file, "w", encoding="utf-8") as f:
-                json.dump(rollbacks, f, ensure_ascii=False, indent=2)
+                json.dump(full_data, f, ensure_ascii=False, indent=2)
+
         elif format == "csv":
             import csv
             with open(output_file, "w", encoding="utf-8-sig", newline="") as f:
                 writer = csv.writer(f)
-                writer.writerow([
-                    "回滚ID", "发布ID", "发布版本", "发布类型",
-                    "从版本", "回滚至版本", "回滚原因", "是否演练",
-                    "影响厂区", "影响厂区数", "开始时间", "完成时间", "执行时间(秒)"
-                ])
-                for rb in rollbacks:
-                    affected_zones = ",".join(rb.get("affected_zones", []))
-                    duration = ""
-                    if rb.get("started_at") and rb.get("completed_at"):
-                        try:
-                            from datetime import datetime
-                            s = datetime.fromisoformat(rb["started_at"])
-                            c = datetime.fromisoformat(rb["completed_at"])
-                            duration = str(round((c - s).total_seconds(), 2))
-                        except:
-                            pass
+                if per_zone_details:
                     writer.writerow([
-                        rb.get("rollback_id", ""),
-                        rb.get("release_id", ""),
-                        rb.get("release_version", ""),
-                        rb.get("release_type", ""),
-                        rb.get("from_version", ""),
-                        rb.get("to_version", ""),
-                        rb.get("reason", ""),
-                        "是" if rb.get("is_drill") else "否",
-                        affected_zones,
-                        len(rb.get("affected_zones", [])),
-                        rb.get("started_at", ""),
-                        rb.get("completed_at", ""),
-                        duration,
+                        "回滚ID", "发布ID", "发布版本", "发布类型",
+                        "从版本", "回滚至版本", "回滚原因", "是否演练",
+                        "厂区ID", "厂区回滚前版本", "厂区回滚后版本", "是否在灰度中",
+                        "开始时间", "完成时间", "执行时间(秒)"
                     ])
+                    for rb in rollbacks:
+                        duration = self._calc_rb_duration(rb)
+                        affected = rb.get("affected_zones", [])
+                        if not affected:
+                            writer.writerow([
+                                rb.get("rollback_id", ""),
+                                rb.get("release_id", ""),
+                                rb.get("release_version", ""),
+                                rb.get("release_type", ""),
+                                rb.get("from_version", ""),
+                                rb.get("to_version", ""),
+                                rb.get("reason", ""),
+                                "是" if rb.get("is_drill") else "否",
+                                "", "", "", "",
+                                rb.get("started_at", ""),
+                                rb.get("completed_at", ""),
+                                duration,
+                            ])
+                        else:
+                            for z in affected:
+                                writer.writerow([
+                                    rb.get("rollback_id", ""),
+                                    rb.get("release_id", ""),
+                                    rb.get("release_version", ""),
+                                    rb.get("release_type", ""),
+                                    rb.get("from_version", ""),
+                                    rb.get("to_version", ""),
+                                    rb.get("reason", ""),
+                                    "是" if rb.get("is_drill") else "否",
+                                    z,
+                                    rb.get("from_version", ""),
+                                    rb.get("to_version", ""),
+                                    "是" if self._is_zone_in_grayscale(rb.get("release_id", ""), z) else "否",
+                                    rb.get("started_at", ""),
+                                    rb.get("completed_at", ""),
+                                    duration,
+                                ])
+                else:
+                    writer.writerow([
+                        "回滚ID", "发布ID", "发布版本", "发布类型",
+                        "从版本", "回滚至版本", "回滚原因", "是否演练",
+                        "影响厂区", "影响厂区数", "开始时间", "完成时间", "执行时间(秒)"
+                    ])
+                    for rb in rollbacks:
+                        affected_zones = ",".join(rb.get("affected_zones", []))
+                        duration = self._calc_rb_duration(rb)
+                        writer.writerow([
+                            rb.get("rollback_id", ""),
+                            rb.get("release_id", ""),
+                            rb.get("release_version", ""),
+                            rb.get("release_type", ""),
+                            rb.get("from_version", ""),
+                            rb.get("to_version", ""),
+                            rb.get("reason", ""),
+                            "是" if rb.get("is_drill") else "否",
+                            affected_zones,
+                            len(rb.get("affected_zones", [])),
+                            rb.get("started_at", ""),
+                            rb.get("completed_at", ""),
+                            duration,
+                        ])
 
         return str(output_path)
 
+    def _calc_rb_duration(self, rb: Dict) -> str:
+        if rb.get("started_at") and rb.get("completed_at"):
+            try:
+                s = datetime.fromisoformat(rb["started_at"])
+                c = datetime.fromisoformat(rb["completed_at"])
+                return str(round((c - s).total_seconds(), 2))
+            except:
+                pass
+        return ""
+
+    def _is_zone_in_grayscale(self, release_id: str, zone_id: str) -> bool:
+        if not release_id:
+            return False
+        release_data = self._load_release_data_internal(release_id)
+        if not release_data:
+            return False
+        for phase in release_data.get("grayscale_phases", []):
+            if phase.get("status") in ("in_progress", "completed"):
+                if zone_id in phase.get("zones", []):
+                    return True
+        return False
+
+    def _load_release_data_internal(self, release_id: str) -> Optional[Dict]:
+        file_path = self.releases_dir / f"{release_id}.json"
+        if not file_path.exists():
+            return None
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
     def save_release(self, release: ReleaseRecord):
-        file_path = self.releases_dir / f"release_{release.release_id}.json"
+        file_path = self.releases_dir / f"{release.release_id}.json"
 
         data = {
             "release_id": release.release_id,
@@ -1009,6 +1092,336 @@ class ReleaseQueryService:
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+class RollbackTraceService:
+    def __init__(self):
+        self.releases_dir = Path(CONFIG["storage"]["releases_dir"])
+        self.reports_dir = Path(CONFIG["storage"]["reports_dir"]) / "rollback"
+        self.audit_logger = AuditLogger()
+
+    def trace_rollback(self, release_id: str = None,
+                       rollback_id: str = None) -> Dict:
+        release = None
+        target_rollback = None
+
+        if release_id:
+            release_data = self._load_release_data(release_id)
+            if not release_data:
+                return {"error": f"未找到发布记录: {release_id}", "timeline": []}
+            release = release_data
+            if rollback_id:
+                for rb in release_data.get("rollback_records", []):
+                    if rb.get("rollback_id") == rollback_id:
+                        target_rollback = rb
+                        break
+                if not target_rollback and release_data.get("rollback_records"):
+                    target_rollback = release_data["rollback_records"][-1]
+            elif release_data.get("rollback_records"):
+                target_rollback = release_data["rollback_records"][-1]
+            else:
+                return {"error": f"发布 {release_id} 无回滚记录", "timeline": []}
+
+        elif rollback_id:
+            release, target_rollback = self._find_by_rollback_id(rollback_id)
+            if not release:
+                return {"error": f"未找到回滚记录: {rollback_id}", "timeline": []}
+
+        else:
+            return {"error": "请提供 release_id 或 rollback_id", "timeline": []}
+
+        timeline = self._build_timeline(release, target_rollback)
+
+        return {
+            "release": release,
+            "rollback": target_rollback,
+            "timeline": timeline,
+            "missing_nodes": self._find_missing_nodes(timeline),
+        }
+
+    def _build_timeline(self, release: Dict, rollback: Dict) -> List[Dict]:
+        timeline = []
+
+        rb_id = rollback.get("rollback_id", "")
+        release_id = release.get("release_id", "")
+
+        circuit_logs = self.audit_logger.query(
+            action="circuit_breaker_triggered",
+            resource_id=release_id,
+        )
+        for log in circuit_logs:
+            timeline.append({
+                "time": log.timestamp.isoformat(),
+                "node": "circuit_breaker_triggered",
+                "label": "🔥 熔断触发",
+                "status": "present",
+                "details": {
+                    "reason": log.details.get("reason", ""),
+                    "affected_zones": log.details.get("affected_zones", []),
+                },
+            })
+
+        rollback_start_logs = self.audit_logger.query(
+            resource_id=release_id,
+        )
+        for log in rollback_start_logs:
+            if log.action in ("rollback_started", "rollback_started_drill"):
+                if log.details.get("rollback_id") == rb_id or rb_id in str(log.details):
+                    timeline.append({
+                        "time": log.timestamp.isoformat(),
+                        "node": "rollback_started",
+                        "label": f"{'🎯 演练回滚开始' if '_drill' in log.action else '🔄 正式回滚开始'}",
+                        "status": "present",
+                        "details": {
+                            "from_version": log.details.get("from_version", ""),
+                            "to_version": log.details.get("to_version", ""),
+                            "affected_zones": log.details.get("affected_zones", []),
+                        },
+                    })
+
+        if rollback.get("started_at"):
+            zone_restore_time = datetime.fromisoformat(rollback["started_at"]) + timedelta(seconds=1)
+            affected_zones = rollback.get("affected_zones", [])
+            if affected_zones:
+                timeline.append({
+                    "time": zone_restore_time.isoformat(),
+                    "node": "zone_version_restored",
+                    "label": "🏭 厂区版本恢复",
+                    "status": "present",
+                    "details": {
+                        "zones_count": len(affected_zones),
+                        "zones": affected_zones,
+                        "to_version": rollback.get("to_version", ""),
+                    },
+                })
+            else:
+                timeline.append({
+                    "time": zone_restore_time.isoformat(),
+                    "node": "zone_version_restored",
+                    "label": "🏭 厂区版本恢复",
+                    "status": "warning",
+                    "details": {"warning": "影响厂区列表为空，请确认是否正常"},
+                })
+
+        report_file = self.reports_dir / f"rollback_report_{rb_id}.json"
+        if report_file.exists():
+            with open(report_file, "r", encoding="utf-8") as f:
+                report_data = json.load(f)
+            report_time = report_data.get("generated_at", "")
+            timeline.append({
+                "time": report_time,
+                "node": "report_generated",
+                "label": "📄 回滚报告生成",
+                "status": "present",
+                "details": {
+                    "file": str(report_file),
+                    "impact_scope": report_data.get("impact_analysis", {}).get("estimated_impact_scope", ""),
+                },
+            })
+        else:
+            timeline.append({
+                "time": "",
+                "node": "report_generated",
+                "label": "📄 回滚报告生成",
+                "status": "missing",
+                "details": {"error": f"未找到报告文件: rollback_report_{rb_id}.json"},
+            })
+
+        rollback_complete_logs = self.audit_logger.query(resource_id=release_id)
+        for log in rollback_complete_logs:
+            if log.action in ("rollback_completed", "rollback_completed_drill"):
+                if log.details.get("rollback_id") == rb_id or rb_id in str(log.details):
+                    timeline.append({
+                        "time": log.timestamp.isoformat(),
+                        "node": "rollback_completed",
+                        "label": f"{'✅ 演练回滚完成' if '_drill' in log.action else '✅ 正式回滚完成'}",
+                        "status": "present",
+                        "details": {
+                            "duration_seconds": log.details.get("duration_seconds", 0),
+                        },
+                    })
+
+        timeline.sort(key=lambda x: x.get("time", "") or "9999")
+        return timeline
+
+    def _find_missing_nodes(self, timeline: List[Dict]) -> List[str]:
+        expected = [
+            "circuit_breaker_triggered",
+            "rollback_started",
+            "zone_version_restored",
+            "report_generated",
+            "rollback_completed",
+        ]
+        present = {t["node"] for t in timeline if t["status"] == "present"}
+        missing = []
+        for node in expected:
+            if node not in present:
+                if node == "circuit_breaker_triggered":
+                    missing.append("熔断触发节点（若为手动回滚则可忽略）")
+                elif node == "rollback_started":
+                    missing.append("回滚开始节点 ❌ 缺失")
+                elif node == "zone_version_restored":
+                    missing.append("厂区版本恢复节点 ❌ 缺失")
+                elif node == "report_generated":
+                    missing.append("回滚报告生成节点 ⚠️ 缺失")
+                elif node == "rollback_completed":
+                    missing.append("回滚完成节点 ❌ 缺失")
+        return missing
+
+    def _load_release_data(self, release_id: str) -> Optional[Dict]:
+        file_path = self.releases_dir / f"{release_id}.json"
+        if not file_path.exists():
+            return None
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def _find_by_rollback_id(self, rollback_id: str) -> Tuple[Optional[Dict], Optional[Dict]]:
+        if not self.releases_dir.exists():
+            return None, None
+        for file in self.releases_dir.glob("*.json"):
+            try:
+                with open(file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                for rb in data.get("rollback_records", []):
+                    if rb.get("rollback_id") == rollback_id:
+                        return data, rb
+            except Exception:
+                continue
+        return None, None
+
+
+class ComplianceReviewService:
+    def __init__(self):
+        self.releases_dir = Path(CONFIG["storage"]["releases_dir"])
+        self.audit_logger = AuditLogger()
+
+    def generate_review(self, start_date: datetime = None,
+                        end_date: datetime = None) -> Dict:
+        releases = self._load_releases_in_range(start_date, end_date)
+
+        total_releases = len(releases)
+        hotfix_count = 0
+        formal_rollbacks = 0
+        drill_rollbacks = 0
+        post_sign_total = 0
+        post_sign_completed = 0
+
+        review_needed = []
+
+        for r in releases:
+            rtype = r.get("release_type", "")
+            if rtype == "hotfix":
+                hotfix_count += 1
+                approval = r.get("approval", {}) or r.get("approval_flow", {})
+                if approval:
+                    post_sign_total += 1
+                    if approval.get("post_sign_complete"):
+                        post_sign_completed += 1
+                    deviation_id = approval.get("deviation_report_id", "")
+                    deviation_desc = approval.get("deviation_report_description", "")
+                    hotfix_reason = approval.get("hotfix_reason", "")
+                    if not deviation_id or not hotfix_reason:
+                        review_needed.append({
+                            "type": "hotfix_incomplete",
+                            "severity": "warning",
+                            "release_id": r.get("release_id"),
+                            "version": r.get("version"),
+                            "issue": "紧急热修复偏差信息不完整",
+                            "details": {
+                                "has_deviation_id": bool(deviation_id),
+                                "has_hotfix_reason": bool(hotfix_reason),
+                                "has_deviation_desc": bool(deviation_desc),
+                            },
+                        })
+
+            for rb in r.get("rollback_records", []):
+                if rb.get("is_drill"):
+                    drill_rollbacks += 1
+                else:
+                    formal_rollbacks += 1
+                if not rb.get("affected_zones"):
+                    review_needed.append({
+                        "type": "rollback_empty_zones",
+                        "severity": "error",
+                        "release_id": r.get("release_id"),
+                        "version": r.get("version"),
+                        "rollback_id": rb.get("rollback_id"),
+                        "issue": "回滚影响厂区为空",
+                        "details": {"reason": rb.get("reason", "")},
+                    })
+
+        drill_logs = self.audit_logger.query(
+            start_time=start_date,
+            end_time=end_date,
+            action="drill_completed",
+        )
+        for log in drill_logs:
+            if log.details.get("drill_result") == "failed" or \
+               log.details.get("result") == "failed":
+                review_needed.append({
+                    "type": "drill_failed",
+                    "severity": "warning",
+                    "drill_id": log.details.get("drill_id", log.resource_id),
+                    "issue": "回滚演练失败",
+                    "details": log.details,
+                })
+
+        scheduled_fail_logs = self.audit_logger.query(
+            start_time=start_date,
+            end_time=end_date,
+            action="scheduled_task_failed",
+        )
+        for log in scheduled_fail_logs:
+            err_type = log.details.get("error_type", "unknown")
+            severity = "error" if err_type == "execution" else "warning"
+            review_needed.append({
+                "type": "drill_failed",
+                "severity": severity,
+                "release_id": log.details.get("release_id"),
+                "issue": f"计划任务失败[{log.details.get('task_name', log.resource_id)}]: {log.details.get('error', '')}",
+                "details": log.details,
+            })
+
+        post_sign_rate = round(
+            (post_sign_completed / post_sign_total * 100) if post_sign_total > 0 else 100.0,
+            2,
+        )
+
+        return {
+            "period": {
+                "start": start_date.isoformat() if start_date else "无限制",
+                "end": end_date.isoformat() if end_date else "无限制",
+            },
+            "summary": {
+                "total_releases": total_releases,
+                "formal_rollbacks": formal_rollbacks,
+                "drill_rollbacks": drill_rollbacks,
+                "hotfix_count": hotfix_count,
+                "post_sign_completed": post_sign_completed,
+                "post_sign_total": post_sign_total,
+                "post_sign_completion_rate": post_sign_rate,
+            },
+            "review_needed": review_needed,
+        }
+
+    def _load_releases_in_range(self, start_date: datetime = None,
+                                end_date: datetime = None) -> List[Dict]:
+        releases = []
+        if not self.releases_dir.exists():
+            return releases
+        for file in self.releases_dir.glob("*.json"):
+            try:
+                with open(file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                created_at = datetime.fromisoformat(data["created_at"])
+                if start_date and created_at < start_date:
+                    continue
+                if end_date and created_at > end_date:
+                    continue
+                releases.append(data)
+            except Exception:
+                continue
+        return releases
 
 
 def generate_weekly_report(releases: List[ReleaseRecord]) -> WeeklyReport:

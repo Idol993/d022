@@ -1,20 +1,20 @@
 {
-  "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
-  "version": "v2.4.1-hf2",
+  "release_id": "61842ede-cb9f-4bc9-82c2-139ff2c36970",
+  "version": "v9.9.9-hotfix",
   "release_type": "hotfix",
   "status": "approval_pending",
-  "title": "产线数据采集异常紧急修复",
+  "title": "紧急热修复",
   "description": "",
   "change_control_id": "",
-  "requester": "ops_lead",
-  "created_at": "2026-06-21T05:58:44.869533",
+  "requester": "QA张工",
+  "created_at": "2026-06-21T06:37:30.815362",
   "previous_version": "",
   "target_zones": [],
   "pre_check_result": {
-    "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
+    "release_id": "61842ede-cb9f-4bc9-82c2-139ff2c36970",
     "overall_pass": false,
-    "started_at": "2026-06-21T05:58:44.869854",
-    "completed_at": "2026-06-21T05:58:44.869880",
+    "started_at": "2026-06-21T06:37:30.815681",
+    "completed_at": "2026-06-21T06:37:30.815706",
     "checks": [
       {
         "check_id": "change_control_001",
@@ -26,7 +26,7 @@
         "evidence": {
           "change_control_id": null
         },
-        "checked_at": "2026-06-21T05:58:44.869859"
+        "checked_at": "2026-06-21T06:37:30.815687"
       },
       {
         "check_id": "deviation_001",
@@ -39,7 +39,7 @@
           "total_open_deviations": 1,
           "impact_deviations": 0
         },
-        "checked_at": "2026-06-21T05:58:44.869864"
+        "checked_at": "2026-06-21T06:37:30.815692"
       },
       {
         "check_id": "capa_001",
@@ -53,7 +53,7 @@
           "overdue_capas": 0,
           "in_progress_capas": 0
         },
-        "checked_at": "2026-06-21T05:58:44.869870"
+        "checked_at": "2026-06-21T06:37:30.815697"
       },
       {
         "check_id": "document_001",
@@ -67,37 +67,37 @@
           "not_effective": 0,
           "version_consistent": 2
         },
-        "checked_at": "2026-06-21T05:58:44.869873"
+        "checked_at": "2026-06-21T06:37:30.815700"
       }
     ]
   },
   "approval_flow": {
-    "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
+    "release_id": "61842ede-cb9f-4bc9-82c2-139ff2c36970",
     "is_hotfix": true,
-    "hotfix_reason": "无菌车间PLC通讯模块故障导致生产数据丢失",
+    "hotfix_reason": "病人数据异常",
     "hotfix_urgency": "high",
-    "deviation_report_id": "DEV-2024-0621",
-    "deviation_report_description": "S7-1200 PLC与上位机通讯中断，持续约15分钟，影响批次20240621001-20240621005",
+    "deviation_report_id": "QAD-2026-007",
+    "deviation_report_description": "数据解析模块异常导致字段错位",
     "post_sign_complete": true,
-    "post_sign_deadline": "2026-06-22T05:58:44.870224",
+    "post_sign_deadline": "2026-06-22T06:37:30.816021",
     "current_step_index": 2,
-    "started_at": "2026-06-21T05:58:44.870229",
+    "started_at": "2026-06-21T06:37:30.816025",
     "completed_at": null,
     "steps": [
       {
         "role": "quality",
         "status": "approved",
-        "approver": "qa_director",
-        "comment": "同意紧急发布，事后补签 (事后补签)",
-        "approved_at": "2026-06-21T05:59:36.756396",
+        "approver": "QA李主管",
+        "comment": "事后补签确认无问题 (事后补签)",
+        "approved_at": "2026-06-21T06:38:19.422322",
         "is_parallel": true
       },
       {
         "role": "regulatory",
         "status": "approved",
-        "approver": "ra_manager",
-        "comment": "法规审查通过，紧急发布 (事后补签)",
-        "approved_at": "2026-06-21T05:59:36.825847",
+        "approver": "RA王总监",
+        "comment": " (事后补签)",
+        "approved_at": "2026-06-21T06:38:34.673342",
         "is_parallel": true
       }
     ]

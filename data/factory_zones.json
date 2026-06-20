@@ -6,7 +6,7 @@
     "description": "非核心研发测试厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.205755",
+    "last_updated": "2026-06-21T06:36:59.075783",
     "last_release_id": ""
   },
   {
@@ -16,7 +16,7 @@
     "description": "非核心办公系统厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.205129",
+    "last_updated": "2026-06-21T06:36:59.075998",
     "last_release_id": ""
   },
   {
@@ -26,7 +26,7 @@
     "description": "常规产品组装产线",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.203540",
+    "last_updated": "2026-06-21T06:36:59.074484",
     "last_release_id": ""
   },
   {
@@ -36,7 +36,7 @@
     "description": "常规产品组装产线",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.203221",
+    "last_updated": "2026-06-21T06:36:59.073684",
     "last_release_id": ""
   },
   {
@@ -46,7 +46,7 @@
     "description": "无菌高值耗材产线",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.202870",
+    "last_updated": "2026-06-21T06:36:59.074185",
     "last_release_id": ""
   },
   {
@@ -56,7 +56,7 @@
     "description": "洁净区包装产线",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:58:14.202655",
+    "last_updated": "2026-06-21T06:36:59.073863",
     "last_release_id": ""
   }
 ]

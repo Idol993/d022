@@ -244,6 +244,9 @@ class TaskScheduler:
 
         target_release = releases[0]
 
+        if not target_release.previous_version:
+            raise ValueError(f"发布 {target_release.version} (ID: {target_release.release_id}) 缺少回滚目标版本（previous_version），无法执行演练。")
+
         drill = self.drill_manager.schedule_drill(
             name=f"{datetime.now().strftime('%Y年%m月')}月度回滚演练",
             scheduled_at=datetime.now(),
@@ -265,11 +268,15 @@ class TaskScheduler:
                 "drill_result": result.result,
                 "duration_seconds": result.duration_seconds,
             },
+            is_critical=(result.status == "failed"),
         )
 
         print(f"🎯 演练结果: {result.status} - {result.result}")
         print(f"   目标版本: {target_release.version}")
         print(f"   耗时: {result.duration_seconds} 秒")
+
+        if result.status == "failed":
+            raise RuntimeError(f"回滚演练执行失败: {result.result}")
 
     def _run_weekly_report(self):
         releases = self.storage.list_releases()

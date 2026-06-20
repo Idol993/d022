@@ -1,0 +1,12 @@
+{
+  "drill_id": "d645eea6-3de1-42f2-87aa-8137bbd0ff3d",
+  "name": "6月月度回滚演练",
+  "scheduled_at": "2026-06-21T06:36:59.075205",
+  "status": "completed",
+  "started_at": "2026-06-21T06:36:59.075426",
+  "completed_at": "2026-06-21T06:36:59.076446",
+  "duration_seconds": 0,
+  "result": "success",
+  "notes": "演练成功完成。回滚耗时: 未知 秒。回滚记录ID: ab6c9cf1-3418-4b1d-aaf8-d4186578a6ab",
+  "is_automated": true
+}

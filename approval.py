@@ -52,6 +52,7 @@ class ApprovalEngine:
             details["hotfix_reason"] = hotfix_reason
             details["hotfix_urgency"] = hotfix_urgency
             details["deviation_report_id"] = deviation_report_id
+            details["deviation_report_description"] = deviation_report_description
 
         self.audit_logger.log_action(
             actor="system",
@@ -252,12 +253,18 @@ class ApprovalEngine:
         if all_signed:
             flow.post_sign_complete = True
 
+            signers = [f"{s.role.value}:{s.approver}" for s in flow.steps if s.approver]
             self.audit_logger.log_action(
                 actor="system",
                 action="approval_post_sign_complete",
                 resource_type="release",
                 resource_id=release.release_id,
-                details={"all_steps_signed": True},
+                details={
+                    "all_steps_signed": True,
+                    "post_sign_status": "completed",
+                    "signers": signers,
+                    "signers_count": len(signers),
+                },
             )
 
         return signed

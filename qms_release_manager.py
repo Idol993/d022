@@ -7,7 +7,7 @@ Medical Device QMS - Release & Rollback Automation Platform
 import sys
 import time
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from models import (
     ReleaseRecord, ReleaseType, ReleaseStatus,
@@ -18,7 +18,10 @@ from pre_check import PreCheckExecutor
 from approval import ApprovalEngine
 from grayscale import GrayscaleReleaseManager
 from rollback import RollbackManager
-from reports import DrillManager, ReportGenerator, ReleaseQueryService
+from reports import (
+    DrillManager, ReportGenerator, ReleaseQueryService,
+    RollbackTraceService, ComplianceReviewService,
+)
 from audit_log import AuditLogger
 from storage import ReleaseStorage
 from notification import NotificationService
@@ -39,6 +42,8 @@ class QMSReleaseManager:
         self.drill_manager = DrillManager()
         self.report_generator = ReportGenerator()
         self.query_service = ReleaseQueryService()
+        self.trace_service = RollbackTraceService()
+        self.compliance_service = ComplianceReviewService()
         self.audit_logger = AuditLogger()
         self.storage = ReleaseStorage()
         self.notifier = NotificationService()
@@ -445,6 +450,95 @@ class QMSReleaseManager:
     def stop_scheduler(self):
         self.scheduler.stop()
 
+    def trace_rollback(self, release_id: str = None,
+                       rollback_id: str = None) -> Dict:
+        result = self.trace_service.trace_rollback(
+            release_id=release_id,
+            rollback_id=rollback_id,
+        )
+
+        if "error" in result and result["error"]:
+            print(f"\n❌ {result['error']}")
+            return result
+
+        rollback = result.get("rollback", {})
+        release = result.get("release", {})
+
+        print(f"\n🔍 回滚追溯")
+        print("=" * 80)
+        print(f"版本: {release.get('version', '')}")
+        print(f"回滚ID: {rollback.get('rollback_id', '')}")
+        print(f"类型: {'演练' if rollback.get('is_drill') else '正式'}")
+        print(f"原因: {rollback.get('reason', '')}")
+        print(f"影响厂区数: {len(rollback.get('affected_zones', []))}")
+
+        print(f"\n⏱️  时间线:")
+        print("-" * 80)
+        for node in result.get("timeline", []):
+            status_icon = {"present": "✅", "missing": "❌", "warning": "⚠️"}.get(node.get("status"), " ")
+            time_str = node.get("time", "")[:19].replace("T", " ") if node.get("time") else ""
+            print(f"  {status_icon} [{time_str}] {node.get('label', '')}")
+            if node.get("status") == "missing":
+                err = node.get("details", {}).get("error", "")
+                if err:
+                    print(f"       ↳ 缺失: {err}")
+            elif node.get("status") == "warning":
+                warn = node.get("details", {}).get("warning", "")
+                if warn:
+                    print(f"       ↳ 警告: {warn}")
+
+        if result.get("missing_nodes"):
+            print(f"\n⚠️  缺失的节点:")
+            for m in result["missing_nodes"]:
+                print(f"   - {m}")
+        else:
+            print(f"\n✅ 所有关键节点齐全")
+
+        return result
+
+    def compliance_review(self, start_date: str = None,
+                          end_date: str = None) -> Dict:
+        from datetime import datetime
+
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+
+        result = self.compliance_service.generate_review(start_dt, end_dt)
+
+        print(f"\n📋 合规复盘摘要")
+        print("=" * 70)
+        print(f"时间范围: {result['period']['start']} ~ {result['period']['end']}")
+
+        s = result["summary"]
+        print(f"\n📊 核心指标:")
+        print(f"  📦 总发布次数: {s['total_releases']}")
+        print(f"  🔄 正式回滚次数: {s['formal_rollbacks']}")
+        print(f"  🎯 演练次数: {s['drill_rollbacks']}")
+        print(f"  🔥 热修复次数: {s['hotfix_count']}")
+        print(f"  ✍️  事后补签完成率: {s['post_sign_completion_rate']}% "
+              f"({s['post_sign_completed']}/{s['post_sign_total']})")
+
+        review = result.get("review_needed", [])
+        if review:
+            severity_map = {"error": "🔴", "warning": "🟡"}
+            print(f"\n⚠️  需要人工复核的记录 ({len(review)} 条):")
+            print("-" * 70)
+            for item in review:
+                icon = severity_map.get(item.get("severity", "warning"), "🟡")
+                print(f"  {icon} [{item.get('type', '')}] {item.get('issue', '')}")
+                if item.get("release_id"):
+                    print(f"     发布ID: {item['release_id']}")
+                if item.get("version"):
+                    print(f"     版本: {item['version']}")
+                if item.get("rollback_id"):
+                    print(f"     回滚ID: {item['rollback_id']}")
+                if item.get("drill_id"):
+                    print(f"     演练ID: {item['drill_id']}")
+        else:
+            print(f"\n✅ 没有需要人工复核的异常记录")
+
+        return result
+
     def print_scheduler_status(self):
         status = self.scheduler.get_status()
 
@@ -588,10 +682,25 @@ class QMSReleaseManager:
                     print(f" " * 24 + f"紧急程度: {details['hotfix_urgency']}")
                 if details.get("deviation_report_id"):
                     print(f" " * 24 + f"偏差报告: {details['deviation_report_id']}")
+                if details.get("deviation_report_description"):
+                    print(f" " * 24 + f"偏差说明: {details['deviation_report_description']}")
+            elif log.action == "approval_post_sign_complete":
+                print(" " * 22 + f"✍️  事后补签完成:")
+                print(f" " * 24 + f"补签状态: {details.get('post_sign_status', 'completed')}")
+                if details.get("signers"):
+                    print(f" " * 24 + f"签署人: {', '.join(details['signers'])}")
             elif "rollback_id" in details:
                 print(" " * 22 + f"🔄 回滚ID: {details['rollback_id']}")
                 if details.get("from_version"):
                     print(f" " * 24 + f"{details['from_version']} → {details.get('to_version','')}")
+            elif log.action == "scheduled_task_failed":
+                err_type = details.get("error_type", "unknown")
+                if err_type == "validation":
+                    print(" " * 22 + "⚠️  任务失败（业务校验）: " + details.get("error", ""))
+                elif err_type == "execution":
+                    print(" " * 22 + "❌ 任务失败（执行出错）: " + details.get("error", ""))
+                else:
+                    print(" " * 22 + "❌ 任务失败: " + details.get("error", ""))
 
         return logs
 
@@ -695,6 +804,10 @@ def main():
             _handle_hotfix_command(manager)
         elif command == "post-sign":
             _handle_post_sign_command(manager)
+        elif command == "trace":
+            _handle_trace_command(manager)
+        elif command == "review":
+            _handle_review_command(manager)
         else:
             print(f"未知命令: {command}")
             print_help()
@@ -862,6 +975,29 @@ def _handle_post_sign_command(manager):
     )
 
 
+def _handle_trace_command(manager):
+    params = _parse_args(sys.argv)
+    release_id = params.get("release-id", "")
+    rollback_id = params.get("rollback-id", "")
+
+    if not release_id and not rollback_id:
+        print("请提供 --release-id 或 --rollback-id 参数")
+        return
+
+    manager.trace_rollback(release_id=release_id, rollback_id=rollback_id)
+
+
+def _handle_review_command(manager):
+    params = _parse_args(sys.argv)
+    start_date = params.get("start", "")
+    end_date = params.get("end", "")
+
+    manager.compliance_review(
+        start_date=start_date if start_date else None,
+        end_date=end_date if end_date else None,
+    )
+
+
 def print_help():
     print("""
 🏥  医疗器械 QMS 版本发布与智能回滚自动化平台
@@ -917,6 +1053,15 @@ def print_help():
     --role <角色>            审批角色
     --signer <签署人>        签署人
     --comment <备注>         补签备注
+
+审计与追溯:
+  trace [选项]        - 回滚追溯，查看完整时间线
+    --release-id <ID>       按发布ID追溯
+    --rollback-id <ID>      按回滚ID追溯
+
+  review [选项]       - 合规复盘摘要
+    --start YYYY-MM-DD      开始日期
+    --end YYYY-MM-DD        结束日期
 """)
 
 

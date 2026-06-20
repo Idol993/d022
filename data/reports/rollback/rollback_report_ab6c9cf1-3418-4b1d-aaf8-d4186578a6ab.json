@@ -1,31 +1,27 @@
 {
   "report_type": "rollback_report",
-  "rollback_id": "0b14ac50-7348-4cb5-9884-2e5d88323413",
-  "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
+  "rollback_id": "ab6c9cf1-3418-4b1d-aaf8-d4186578a6ab",
+  "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
   "release_version": "v2.4.0",
   "rollback_to_version": "v2.3.0",
-  "rollback_reason": "偏差发生率 2.28% > 阈值 2.0%",
-  "is_drill": false,
+  "rollback_reason": "回滚演练: 6月月度回滚演练",
+  "is_drill": true,
   "timeline": {
-    "started_at": "2026-06-21T05:58:14.202413",
-    "completed_at": "2026-06-21T05:58:14.203644",
+    "started_at": "2026-06-21T06:36:59.075506",
+    "completed_at": "2026-06-21T06:36:59.076120",
     "duration_seconds": 0.0
   },
   "impact_analysis": {
     "affected_zones": [
-      "tier1_sterile_02",
-      "tier1_sterile_01",
-      "tier3_office_01",
-      "tier2_assembly_02",
       "tier3_rd_01",
-      "tier2_assembly_01"
+      "tier3_office_01"
     ],
     "affected_batches": [],
-    "estimated_impact_scope": "wide"
+    "estimated_impact_scope": "limited"
   },
   "root_cause": {
-    "description": "偏差发生率 2.28% > 阈值 2.0%",
-    "category": "system_anomaly"
+    "description": "回滚演练: 6月月度回滚演练",
+    "category": "drill"
   },
   "remediation_actions": [
     "版本已回滚至上一稳定版本",
@@ -37,5 +33,5 @@
     "评估是否需要启动偏差/CAPA流程",
     "验证修复后重新安排发布"
   ],
-  "generated_at": "2026-06-21T05:58:14.203728"
+  "generated_at": "2026-06-21T06:36:59.076202"
 }

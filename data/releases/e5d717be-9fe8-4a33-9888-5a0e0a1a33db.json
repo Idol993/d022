@@ -1,5 +1,5 @@
 {
-  "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
+  "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
   "version": "v2.4.0",
   "release_type": "regular",
   "status": "rolled_back",
@@ -7,14 +7,14 @@
   "description": "包含偏差管理模块优化、CAPA流程增强、报表功能升级",
   "change_control_id": "CC-2024-032",
   "requester": "dev_leader",
-  "created_at": "2026-06-21T05:58:14.191846",
+  "created_at": "2026-06-21T06:36:59.064840",
   "previous_version": "v2.3.0",
   "target_zones": [],
   "pre_check_result": {
-    "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
+    "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
     "overall_pass": true,
-    "started_at": "2026-06-21T05:58:14.192206",
-    "completed_at": "2026-06-21T05:58:14.192247",
+    "started_at": "2026-06-21T06:36:59.065103",
+    "completed_at": "2026-06-21T06:36:59.065135",
     "checks": [
       {
         "check_id": "change_control_001",
@@ -31,7 +31,7 @@
           "change_type": "minor",
           "approval_chain_complete": true
         },
-        "checked_at": "2026-06-21T05:58:14.192215"
+        "checked_at": "2026-06-21T06:36:59.065109"
       },
       {
         "check_id": "deviation_001",
@@ -44,7 +44,7 @@
           "total_open_deviations": 1,
           "impact_deviations": 0
         },
-        "checked_at": "2026-06-21T05:58:14.192224"
+        "checked_at": "2026-06-21T06:36:59.065117"
       },
       {
         "check_id": "capa_001",
@@ -58,7 +58,7 @@
           "overdue_capas": 0,
           "in_progress_capas": 0
         },
-        "checked_at": "2026-06-21T05:58:14.192233"
+        "checked_at": "2026-06-21T06:36:59.065124"
       },
       {
         "check_id": "document_001",
@@ -72,12 +72,12 @@
           "not_effective": 0,
           "version_consistent": 2
         },
-        "checked_at": "2026-06-21T05:58:14.192238"
+        "checked_at": "2026-06-21T06:36:59.065128"
       }
     ]
   },
   "approval_flow": {
-    "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
+    "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
     "is_hotfix": false,
     "hotfix_reason": "",
     "hotfix_urgency": "medium",
@@ -86,15 +86,15 @@
     "post_sign_complete": false,
     "post_sign_deadline": null,
     "current_step_index": 4,
-    "started_at": "2026-06-21T05:58:14.192741",
-    "completed_at": "2026-06-21T05:58:14.194058",
+    "started_at": "2026-06-21T06:36:59.065524",
+    "completed_at": "2026-06-21T06:36:59.067162",
     "steps": [
       {
         "role": "quality",
         "status": "approved",
         "approver": "qa_manager",
         "comment": "质量评估通过",
-        "approved_at": "2026-06-21T05:58:14.193095",
+        "approved_at": "2026-06-21T06:36:59.065857",
         "is_parallel": false
       },
       {
@@ -102,7 +102,7 @@
         "status": "approved",
         "approver": "ra_specialist",
         "comment": "法规符合性确认",
-        "approved_at": "2026-06-21T05:58:14.193411",
+        "approved_at": "2026-06-21T06:36:59.066181",
         "is_parallel": false
       },
       {
@@ -110,7 +110,7 @@
         "status": "approved",
         "approver": "rnd_manager",
         "comment": "设计控制与需求追溯确认",
-        "approved_at": "2026-06-21T05:58:14.193701",
+        "approved_at": "2026-06-21T06:36:59.066744",
         "is_parallel": false
       },
       {
@@ -118,14 +118,14 @@
         "status": "approved",
         "approver": "prod_supervisor",
         "comment": "生产影响评估通过",
-        "approved_at": "2026-06-21T05:58:14.193990",
+        "approved_at": "2026-06-21T06:36:59.067096",
         "is_parallel": false
       }
     ]
   },
   "grayscale_phases": [
     {
-      "phase_id": "phase_1_5b369fd8",
+      "phase_id": "phase_1_725d5756",
       "name": "非核心/研发厂区",
       "tier": "tier3_non_core",
       "zones": [
@@ -133,13 +133,13 @@
         "tier3_office_01"
       ],
       "status": "completed",
-      "started_at": "2026-06-21T05:58:14.195297",
-      "completed_at": "2026-06-21T05:58:14.197177",
+      "started_at": "2026-06-21T06:36:59.068138",
+      "completed_at": "2026-06-21T06:36:59.069930",
       "monitor_interval_minutes": 5,
       "duration_minutes": 30
     },
     {
-      "phase_id": "phase_2_c671e585",
+      "phase_id": "phase_2_bf243910",
       "name": "常规组装线",
       "tier": "tier2_assembly",
       "zones": [
@@ -147,13 +147,13 @@
         "tier2_assembly_02"
       ],
       "status": "completed",
-      "started_at": "2026-06-21T05:58:14.197284",
-      "completed_at": "2026-06-21T05:58:14.200231",
+      "started_at": "2026-06-21T06:36:59.070034",
+      "completed_at": "2026-06-21T06:36:59.071809",
       "monitor_interval_minutes": 5,
       "duration_minutes": 60
     },
     {
-      "phase_id": "phase_3_60741ed5",
+      "phase_id": "phase_3_e71cf7a7",
       "name": "无菌/高值耗材产线",
       "tier": "tier1_sterile",
       "zones": [
@@ -161,7 +161,7 @@
         "tier1_sterile_02"
       ],
       "status": "in_progress",
-      "started_at": "2026-06-21T05:58:14.200371",
+      "started_at": "2026-06-21T06:36:59.071886",
       "completed_at": null,
       "monitor_interval_minutes": 5,
       "duration_minutes": 120
@@ -169,22 +169,22 @@
   ],
   "rollback_records": [
     {
-      "rollback_id": "0b14ac50-7348-4cb5-9884-2e5d88323413",
-      "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
-      "reason": "偏差发生率 2.28% > 阈值 2.0%",
+      "rollback_id": "604a3fe9-2d87-4734-80e6-ee20fe53ba31",
+      "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
+      "reason": "偏差发生率 2.67% > 阈值 2.0%",
       "affected_zones": [
-        "tier1_sterile_02",
-        "tier1_sterile_01",
-        "tier3_office_01",
         "tier2_assembly_02",
+        "tier1_sterile_02",
+        "tier3_office_01",
+        "tier1_sterile_01",
         "tier3_rd_01",
         "tier2_assembly_01"
       ],
       "affected_batches": [],
       "from_version": "v2.4.0",
       "to_version": "v2.3.0",
-      "started_at": "2026-06-21T05:58:14.202413",
-      "completed_at": "2026-06-21T05:58:14.203644",
+      "started_at": "2026-06-21T06:36:59.073477",
+      "completed_at": "2026-06-21T06:36:59.074577",
       "is_drill": false,
       "report_generated": true
     }

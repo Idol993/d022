@@ -1,0 +1,68 @@
+[
+  {
+    "rollback_id": "604a3fe9-2d87-4734-80e6-ee20fe53ba31",
+    "release_id": "e5d717be-9fe8-4a33-9888-5a0e0a1a33db",
+    "reason": "偏差发生率 2.67% > 阈值 2.0%",
+    "affected_zones": [
+      "tier2_assembly_02",
+      "tier1_sterile_02",
+      "tier3_office_01",
+      "tier1_sterile_01",
+      "tier3_rd_01",
+      "tier2_assembly_01"
+    ],
+    "affected_batches": [],
+    "from_version": "v2.4.0",
+    "to_version": "v2.3.0",
+    "started_at": "2026-06-21T06:36:59.073477",
+    "completed_at": "2026-06-21T06:36:59.074577",
+    "is_drill": false,
+    "report_generated": true,
+    "release_version": "v2.4.0",
+    "release_type": "regular",
+    "zones_detail": [
+      {
+        "zone_id": "tier2_assembly_02",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      },
+      {
+        "zone_id": "tier1_sterile_02",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      },
+      {
+        "zone_id": "tier3_office_01",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      },
+      {
+        "zone_id": "tier1_sterile_01",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      },
+      {
+        "zone_id": "tier3_rd_01",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      },
+      {
+        "zone_id": "tier2_assembly_01",
+        "from_version": "v2.4.0",
+        "to_version": "v2.3.0",
+        "in_grayscale": true,
+        "is_drill": false
+      }
+    ]
+  }
+]

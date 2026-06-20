@@ -264,8 +264,14 @@ class ReleaseStorage:
             release_id=data["release_id"],
             is_hotfix=data.get("is_hotfix", False),
             hotfix_reason=data.get("hotfix_reason", ""),
+            hotfix_urgency=data.get("hotfix_urgency", "medium"),
+            deviation_report_id=data.get("deviation_report_id", ""),
+            deviation_report_description=data.get("deviation_report_description", ""),
+            post_sign_complete=data.get("post_sign_complete", False),
             current_step_index=data.get("current_step_index", 0),
         )
+        if data.get("post_sign_deadline"):
+            flow.post_sign_deadline = datetime.fromisoformat(data["post_sign_deadline"])
         if data.get("started_at"):
             flow.started_at = datetime.fromisoformat(data["started_at"])
         if data.get("completed_at"):

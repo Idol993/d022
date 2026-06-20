@@ -195,8 +195,10 @@ class TaskScheduler:
 
             print(f"✅ 计划任务完成: {task.name}")
 
-        except Exception as e:
-            print(f"❌ 计划任务失败: {task.name} - {e}")
+        except ValueError as e:
+            error_msg = str(e)
+            print(f"❌ 计划任务失败: {task.name}")
+            print(f"   原因: {error_msg}")
 
             self.audit_logger.log_action(
                 actor="system",
@@ -205,18 +207,40 @@ class TaskScheduler:
                 resource_id=task.name,
                 details={
                     "task_type": task.task_type,
-                    "error": str(e),
+                    "error": error_msg,
+                    "error_type": "validation",
                 },
                 is_critical=True,
             )
+            raise
+
+        except Exception as e:
+            error_msg = str(e)
+            print(f"❌ 计划任务失败: {task.name}")
+            print(f"   原因: 执行过程出错 - {error_msg}")
+
+            self.audit_logger.log_action(
+                actor="system",
+                action="scheduled_task_failed",
+                resource_type="scheduler",
+                resource_id=task.name,
+                details={
+                    "task_type": task.task_type,
+                    "error": error_msg,
+                    "error_type": "execution",
+                },
+                is_critical=True,
+            )
+            raise
 
     def _run_monthly_drill(self):
         releases = self.storage.list_releases(status=ReleaseStatus.FULLY_RELEASED)
 
         if not releases:
             releases = self.storage.list_releases()
-            if not releases:
-                raise ValueError("没有可用的发布记录用于演练")
+
+        if not releases:
+            raise ValueError("没有可用的发布记录用于回滚演练。请先完成至少一次发布流程。")
 
         target_release = releases[0]
 
@@ -226,7 +250,26 @@ class TaskScheduler:
             is_automated=True,
         )
 
-        self.drill_manager.execute_drill(drill, target_release)
+        result = self.drill_manager.execute_drill(drill, target_release)
+
+        self.audit_logger.log_action(
+            actor="system",
+            action="monthly_drill_completed",
+            resource_type="drill",
+            resource_id=drill.drill_id,
+            details={
+                "drill_name": drill.name,
+                "target_release_id": target_release.release_id,
+                "target_version": target_release.version,
+                "drill_status": result.status,
+                "drill_result": result.result,
+                "duration_seconds": result.duration_seconds,
+            },
+        )
+
+        print(f"🎯 演练结果: {result.status} - {result.result}")
+        print(f"   目标版本: {target_release.version}")
+        print(f"   耗时: {result.duration_seconds} 秒")
 
     def _run_weekly_report(self):
         releases = self.storage.list_releases()
@@ -259,13 +302,22 @@ class TaskScheduler:
 
     def run_task_now(self, task_name: str) -> bool:
         if task_name not in self.tasks:
+            print(f"❌ 任务不存在: {task_name}")
+            print(f"可用任务: {', '.join(self.tasks.keys())}")
             return False
 
         task = self.tasks[task_name]
-        self._execute_task(task)
-        task.last_run = datetime.now()
-        task.run_count += 1
-        return True
+        try:
+            self._execute_task(task)
+            task.last_run = datetime.now()
+            task.run_count += 1
+            return True
+        except ValueError as e:
+            print(f"\n❌ 任务执行失败: {e}")
+            return False
+        except Exception as e:
+            print(f"\n❌ 任务执行失败: 执行过程出错 - {e}")
+            return False
 
     def list_tasks(self) -> List[Dict]:
         tasks = []

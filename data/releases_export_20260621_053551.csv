@@ -1,5 +1,0 @@
-﻿发布ID,版本号,发布类型,状态,创建人,创建时间,变更控制单,回滚次数,影响厂区数
-6622bf7a-504e-40a9-9568-af49d410f6af,v2.4.1-hf1,hotfix,approval_pending,ops_lead,2026-06-21T05:33:21.026119,,0,0
-5510fff3-45cb-407e-9a74-9ec8fccb9677,v2.4.0,regular,rolled_back,dev_leader,2026-06-21T05:33:02.474013,CC-2024-032,1,6
-b71d984a-2d40-43bf-b0bc-c59ce0e6e3fd,v2.4.0,regular,fully_released,dev_leader,2026-06-21T05:30:58.942434,CC-2024-032,0,6
-bcdc1b17-74db-499f-a30a-3b3606bbdb9c,v2.4.0,regular,rolled_back,dev_leader,2026-06-21T05:13:56.888942,CC-2024-032,1,6

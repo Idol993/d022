@@ -1,20 +1,20 @@
 {
   "report_type": "rollback_report",
-  "rollback_id": "dcb7230e-28c0-471c-9f91-08aaae88ec48",
-  "release_id": "5510fff3-45cb-407e-9a74-9ec8fccb9677",
+  "rollback_id": "d5a37947-ab60-4316-af8d-97f80b21745d",
+  "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
   "release_version": "v2.4.0",
   "rollback_to_version": "v2.3.0",
   "rollback_reason": "回滚演练: 6月月度回滚演练",
   "is_drill": true,
   "timeline": {
-    "started_at": "2026-06-21T05:33:02.485017",
-    "completed_at": "2026-06-21T05:33:02.485560",
+    "started_at": "2026-06-21T05:58:14.204792",
+    "completed_at": "2026-06-21T05:58:14.206025",
     "duration_seconds": 0.0
   },
   "impact_analysis": {
     "affected_zones": [
-      "tier3_rd_01",
-      "tier3_office_01"
+      "tier3_office_01",
+      "tier3_rd_01"
     ],
     "affected_batches": [],
     "estimated_impact_scope": "limited"
@@ -33,5 +33,5 @@
     "评估是否需要启动偏差/CAPA流程",
     "验证修复后重新安排发布"
   ],
-  "generated_at": "2026-06-21T05:33:02.485704"
+  "generated_at": "2026-06-21T05:58:14.206173"
 }

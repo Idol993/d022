@@ -469,7 +469,7 @@ class QMSReleaseManager:
         if success:
             print(f"✅ 已立即执行任务: {task_name}")
         else:
-            print(f"❌ 任务不存在: {task_name}")
+            print(f"❌ 任务执行失败: {task_name}")
 
     def list_all_releases(self, status: ReleaseStatus = None) -> List[ReleaseRecord]:
         releases = self.storage.list_releases(status=status)
@@ -570,10 +570,28 @@ class QMSReleaseManager:
         )
 
         print(f"\n📝 审计日志 (共 {len(logs)} 条)")
-        print("=" * 70)
-        for log in logs[-10:]:
-            print(f"[{log.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] "
-                  f"{log.actor} - {log.action} - {log.resource_type}:{log.resource_id}")
+        print("=" * 90)
+        for log in logs[-15:]:
+            critical_icon = "🔴" if log.is_critical else "  "
+            base_info = (f"[{log.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] "
+                        f"{critical_icon} {log.actor} - {log.action} "
+                        f"- {log.resource_type}:{log.resource_id}")
+            print(base_info)
+
+            details = log.details or {}
+            hotfix_fields = ["hotfix_reason", "hotfix_urgency", "deviation_report_id"]
+            if any(f in details for f in hotfix_fields):
+                print(" " * 22 + "🔥 热修复信息:")
+                if details.get("hotfix_reason"):
+                    print(f" " * 24 + f"紧急原因: {details['hotfix_reason']}")
+                if details.get("hotfix_urgency"):
+                    print(f" " * 24 + f"紧急程度: {details['hotfix_urgency']}")
+                if details.get("deviation_report_id"):
+                    print(f" " * 24 + f"偏差报告: {details['deviation_report_id']}")
+            elif "rollback_id" in details:
+                print(" " * 22 + f"🔄 回滚ID: {details['rollback_id']}")
+                if details.get("from_version"):
+                    print(f" " * 24 + f"{details['from_version']} → {details.get('to_version','')}")
 
         return logs
 
@@ -870,7 +888,8 @@ def print_help():
     --status <状态>          按状态筛选
     --release-type <类型>    按发布类型筛选
 
-  export [选项]       - 导出发布记录
+  export [选项]       - 导出发布/回滚记录
+    --type release|rollback   导出类型 (默认 release)
     --format json|csv         导出格式 (默认 json)
     --output <路径>           输出文件路径
     --start/--end/--zone/...  筛选条件同 query
@@ -880,7 +899,8 @@ def print_help():
     --action start          启动调度器
     --action stop           停止调度器
     --action status         查看状态 (默认)
-    --action run --task <名> 立即执行指定任务
+    --action run --task <task_name> 立即执行指定任务
+                               可用任务: monthly_drill, weekly_report
 
 紧急热修复:
   hotfix [选项]       - 创建紧急热修复发布

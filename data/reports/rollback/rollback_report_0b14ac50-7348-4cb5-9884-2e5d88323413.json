@@ -1,25 +1,30 @@
 {
   "report_type": "rollback_report",
-  "rollback_id": "ec922b90-0beb-4dee-b76a-194f2c898ac1",
-  "release_id": "5510fff3-45cb-407e-9a74-9ec8fccb9677",
+  "rollback_id": "0b14ac50-7348-4cb5-9884-2e5d88323413",
+  "release_id": "2b905922-e6f0-41bb-ae67-1f720af02eff",
   "release_version": "v2.4.0",
   "rollback_to_version": "v2.3.0",
-  "rollback_reason": "审批流程阻塞率 10.1% > 阈值 10.0%",
+  "rollback_reason": "偏差发生率 2.28% > 阈值 2.0%",
   "is_drill": false,
   "timeline": {
-    "started_at": "2026-06-21T05:33:02.483005",
-    "completed_at": "2026-06-21T05:33:02.483351",
+    "started_at": "2026-06-21T05:58:14.202413",
+    "completed_at": "2026-06-21T05:58:14.203644",
     "duration_seconds": 0.0
   },
   "impact_analysis": {
     "affected_zones": [
-      "tier2_assembly_02"
+      "tier1_sterile_02",
+      "tier1_sterile_01",
+      "tier3_office_01",
+      "tier2_assembly_02",
+      "tier3_rd_01",
+      "tier2_assembly_01"
     ],
     "affected_batches": [],
-    "estimated_impact_scope": "limited"
+    "estimated_impact_scope": "wide"
   },
   "root_cause": {
-    "description": "审批流程阻塞率 10.1% > 阈值 10.0%",
+    "description": "偏差发生率 2.28% > 阈值 2.0%",
     "category": "system_anomaly"
   },
   "remediation_actions": [
@@ -32,5 +37,5 @@
     "评估是否需要启动偏差/CAPA流程",
     "验证修复后重新安排发布"
   ],
-  "generated_at": "2026-06-21T05:33:02.483462"
+  "generated_at": "2026-06-21T05:58:14.203728"
 }

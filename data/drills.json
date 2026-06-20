@@ -1,38 +1,26 @@
 [
   {
-    "drill_id": "f185db32-f86f-4142-850f-7c15a99b7d21",
+    "drill_id": "1f509491-7820-450b-8cac-894763eeac96",
     "name": "6月月度回滚演练",
-    "scheduled_at": "2026-06-21T05:13:56.896229",
+    "scheduled_at": "2026-06-21T05:58:14.204381",
     "status": "completed",
-    "started_at": "2026-06-21T05:13:56.896537",
-    "completed_at": "2026-06-21T05:13:56.897031",
+    "started_at": "2026-06-21T05:58:14.204729",
+    "completed_at": "2026-06-21T05:58:14.206753",
     "duration_seconds": 0,
     "result": "success",
-    "notes": "演练成功完成。回滚耗时: 未知 秒。回滚记录ID: ad968e20-a59a-416a-aa63-a0e5abfe7b7e",
+    "notes": "演练成功完成。回滚耗时: 未知 秒。回滚记录ID: d5a37947-ab60-4316-af8d-97f80b21745d",
     "is_automated": true
   },
   {
-    "drill_id": "165cb13a-5122-46f6-8d14-f4465a702835",
-    "name": "6月月度回滚演练",
-    "scheduled_at": "2026-06-21T05:30:58.954405",
-    "status": "completed",
-    "started_at": "2026-06-21T05:30:58.954706",
-    "completed_at": "2026-06-21T05:30:58.955762",
+    "drill_id": "4135f59d-3cfb-4bf5-966b-79cbf922806a",
+    "name": "2026年06月月度回滚演练",
+    "scheduled_at": "2026-06-21T06:00:05.482040",
+    "status": "failed",
+    "started_at": "2026-06-21T06:00:05.482622",
+    "completed_at": "2026-06-21T06:00:05.482762",
     "duration_seconds": 0,
-    "result": "success",
-    "notes": "演练成功完成。回滚耗时: 未知 秒。回滚记录ID: 37e883fc-3d07-4e67-9d19-0a13558c61c0",
-    "is_automated": true
-  },
-  {
-    "drill_id": "78384c94-72a9-4d53-b05f-bb919d5fa1d5",
-    "name": "6月月度回滚演练",
-    "scheduled_at": "2026-06-21T05:33:02.484567",
-    "status": "completed",
-    "started_at": "2026-06-21T05:33:02.484956",
-    "completed_at": "2026-06-21T05:33:02.485990",
-    "duration_seconds": 0,
-    "result": "success",
-    "notes": "演练成功完成。回滚耗时: 未知 秒。回滚记录ID: dcb7230e-28c0-471c-9f91-08aaae88ec48",
+    "result": "failed",
+    "notes": "演练失败: 未设置回滚目标版本（previous_version）",
     "is_automated": true
   }
 ]

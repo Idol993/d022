@@ -6,7 +6,7 @@
     "description": "非核心研发测试厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:33:02.485240",
+    "last_updated": "2026-06-21T05:58:14.205755",
     "last_release_id": ""
   },
   {
@@ -16,7 +16,7 @@
     "description": "非核心办公系统厂区",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:33:02.485446",
+    "last_updated": "2026-06-21T05:58:14.205129",
     "last_release_id": ""
   },
   {
@@ -24,10 +24,10 @@
     "name": "组装一车间",
     "tier": "tier2_assembly",
     "description": "常规产品组装产线",
-    "current_version": "v2.4.0",
+    "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:33:02.480921",
-    "last_release_id": "5510fff3-45cb-407e-9a74-9ec8fccb9677"
+    "last_updated": "2026-06-21T05:58:14.203540",
+    "last_release_id": ""
   },
   {
     "zone_id": "tier2_assembly_02",
@@ -36,7 +36,7 @@
     "description": "常规产品组装产线",
     "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:33:02.483223",
+    "last_updated": "2026-06-21T05:58:14.203221",
     "last_release_id": ""
   },
   {
@@ -44,19 +44,19 @@
     "name": "无菌生产车间",
     "tier": "tier1_sterile",
     "description": "无菌高值耗材产线",
-    "current_version": "v2.4.0",
+    "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.951355",
-    "last_release_id": "b71d984a-2d40-43bf-b0bc-c59ce0e6e3fd"
+    "last_updated": "2026-06-21T05:58:14.202870",
+    "last_release_id": ""
   },
   {
     "zone_id": "tier1_sterile_02",
     "name": "洁净包装车间",
     "tier": "tier1_sterile",
     "description": "洁净区包装产线",
-    "current_version": "v2.4.0",
+    "current_version": "v2.3.0",
     "is_active": true,
-    "last_updated": "2026-06-21T05:30:58.951543",
-    "last_release_id": "b71d984a-2d40-43bf-b0bc-c59ce0e6e3fd"
+    "last_updated": "2026-06-21T05:58:14.202655",
+    "last_release_id": ""
   }
 ]

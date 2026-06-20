@@ -112,7 +112,7 @@ CONFIG = {
     },
 
     "drill": {
-        "monthly_drill_enabled": False,
+        "monthly_drill_enabled": True,
         "drill_day_of_month": 15,
         "drill_time": "02:00",
         "drill_zones": ["tier3_rd_01", "tier3_office_01"],

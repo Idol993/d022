@@ -1,20 +1,20 @@
 {
-  "release_id": "6622bf7a-504e-40a9-9568-af49d410f6af",
-  "version": "v2.4.1-hf1",
+  "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
+  "version": "v2.4.1-hf2",
   "release_type": "hotfix",
   "status": "approval_pending",
-  "title": "生产环境紧急修复",
+  "title": "产线数据采集异常紧急修复",
   "description": "",
   "change_control_id": "",
   "requester": "ops_lead",
-  "created_at": "2026-06-21T05:33:21.026119",
+  "created_at": "2026-06-21T05:58:44.869533",
   "previous_version": "",
   "target_zones": [],
   "pre_check_result": {
-    "release_id": "6622bf7a-504e-40a9-9568-af49d410f6af",
+    "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
     "overall_pass": false,
-    "started_at": "2026-06-21T05:33:21.027700",
-    "completed_at": "2026-06-21T05:33:21.027735",
+    "started_at": "2026-06-21T05:58:44.869854",
+    "completed_at": "2026-06-21T05:58:44.869880",
     "checks": [
       {
         "check_id": "change_control_001",
@@ -26,7 +26,7 @@
         "evidence": {
           "change_control_id": null
         },
-        "checked_at": "2026-06-21T05:33:21.027710"
+        "checked_at": "2026-06-21T05:58:44.869859"
       },
       {
         "check_id": "deviation_001",
@@ -39,7 +39,7 @@
           "total_open_deviations": 1,
           "impact_deviations": 0
         },
-        "checked_at": "2026-06-21T05:33:21.027716"
+        "checked_at": "2026-06-21T05:58:44.869864"
       },
       {
         "check_id": "capa_001",
@@ -53,7 +53,7 @@
           "overdue_capas": 0,
           "in_progress_capas": 0
         },
-        "checked_at": "2026-06-21T05:33:21.027724"
+        "checked_at": "2026-06-21T05:58:44.869870"
       },
       {
         "check_id": "document_001",
@@ -67,32 +67,37 @@
           "not_effective": 0,
           "version_consistent": 2
         },
-        "checked_at": "2026-06-21T05:33:21.027729"
+        "checked_at": "2026-06-21T05:58:44.869873"
       }
     ]
   },
   "approval_flow": {
-    "release_id": "6622bf7a-504e-40a9-9568-af49d410f6af",
+    "release_id": "9ed32755-df8f-4f28-8f42-9a3d758a5785",
     "is_hotfix": true,
-    "hotfix_reason": "生产车间数据采集异常",
+    "hotfix_reason": "无菌车间PLC通讯模块故障导致生产数据丢失",
+    "hotfix_urgency": "high",
+    "deviation_report_id": "DEV-2024-0621",
+    "deviation_report_description": "S7-1200 PLC与上位机通讯中断，持续约15分钟，影响批次20240621001-20240621005",
+    "post_sign_complete": true,
+    "post_sign_deadline": "2026-06-22T05:58:44.870224",
     "current_step_index": 2,
-    "started_at": "2026-06-21T05:33:21.028496",
+    "started_at": "2026-06-21T05:58:44.870229",
     "completed_at": null,
     "steps": [
       {
         "role": "quality",
         "status": "approved",
         "approver": "qa_director",
-        "comment": "紧急情况下同意发布 (事后补签)",
-        "approved_at": "2026-06-21T05:37:06.594249",
+        "comment": "同意紧急发布，事后补签 (事后补签)",
+        "approved_at": "2026-06-21T05:59:36.756396",
         "is_parallel": true
       },
       {
         "role": "regulatory",
         "status": "approved",
         "approver": "ra_manager",
-        "comment": "法规评估紧急通过 (事后补签)",
-        "approved_at": "2026-06-21T05:37:19.555803",
+        "comment": "法规审查通过，紧急发布 (事后补签)",
+        "approved_at": "2026-06-21T05:59:36.825847",
         "is_parallel": true
       }
     ]
